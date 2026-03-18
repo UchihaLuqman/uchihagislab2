@@ -19,12 +19,60 @@
             padding: 0;
             margin: 0;
         }
+
+        /* --- TAMBAHAN CSS UNTUK LOGO DAN TAJUK --- */
+        #header-container {
+            position: absolute;
+            top: 10px;
+            left: 50px; /* Jarak dari kiri supaya tidak bertindih dengan butang zoom */
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border: 2px solid #333;
+        }
+
+        #logo-puo {
+            height: 60px; /* Saiz logo */
+            margin-right: 15px;
+        }
+
+        #title-text {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+
+        #title-text h2 {
+            margin: 0;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+
+        #title-text p {
+            margin: 0;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        /* ---------------------------------------- */
         </style>
-        <title></title>
+        <title>Peta Taman Perumahan - PUO</title>
     </head>
     <body>
+        
+        <div id="header-container">
+            <img id="logo-puo" src="https://upload.wikimedia.org/wikipedia/ms/thumb/0/02/Politeknik_Ungku_Omar_logo.png/220px-Politeknik_Ungku_Omar_logo.png" alt="Logo PUO">
+            <div id="title-text">
+                <h2>TAMAN PERUMAHAN</h2>
+                <p>Politeknik Ungku Omar</p>
+            </div>
+        </div>
         <div id="map">
         </div>
+
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
         <script src="js/L.Control.Layers.Tree.min.js"></script>
@@ -51,7 +99,7 @@
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
-        // remove popup's row if "visible-with-data"
+        
         function removeEmptyRowsFromPopupContent(content, feature) {
          var tempDiv = document.createElement('div');
          tempDiv.innerHTML = content;
@@ -65,7 +113,7 @@
          }
          return tempDiv.innerHTML;
         }
-        // modify popup if contains media
+
         function addClassToPopupIfMedia(content, popup) {
             var tempDiv = document.createElement('div');
             tempDiv.innerHTML = content;
@@ -97,7 +145,6 @@
                     video.style.maxWidth = "60vw";
                     imgTd.parentNode.replaceChild(video, imgTd);
                     popup._contentNode.classList.add('media');
-                    // Aggiorna il popup quando il video carica i metadati
                     video.addEventListener('loadedmetadata', function() {
                         popup.update();
                     });
@@ -112,12 +159,14 @@
                 popup._contentNode.classList.remove('media');
             }
         }
+
         var zoomControl = L.control.zoom({
             position: 'topleft'
         }).addTo(map);
+
         var bounds_group = new L.featureGroup([]);
-        function setBounds() {
-        }
+        function setBounds() {}
+
         map.createPane('pane_GoogleSatellite_0');
         map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
         var layer_GoogleSatellite_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
@@ -129,8 +178,8 @@
             minNativeZoom: 0,
             maxNativeZoom: 20
         });
-        layer_GoogleSatellite_0;
         map.addLayer(layer_GoogleSatellite_0);
+
         function pop_lotfinalpolygonice_1(feature, layer) {
             layer.on({
                 mouseout: function(e) {
@@ -165,10 +214,10 @@
                     </tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-			layer.on('popupopen', function(e) {
-				addClassToPopupIfMedia(content, e.popup);
-			});
-			layer.bindPopup(content, { maxHeight: 400 });
+            layer.on('popupopen', function(e) {
+                addClassToPopupIfMedia(content, e.popup);
+            });
+            layer.bindPopup(content, { maxHeight: 400 });
         }
 
         function style_lotfinalpolygonice_1_0() {
@@ -188,7 +237,7 @@
         }
         map.createPane('pane_lotfinalpolygonice_1');
         map.getPane('pane_lotfinalpolygonice_1').style.zIndex = 401;
-        map.getPane('pane_lotfinalpolygonice_1').style['mix-blend-mode'] = 'normal';
+        
         var layer_lotfinalpolygonice_1 = new L.geoJson(json_lotfinalpolygonice_1, {
             attribution: '',
             interactive: true,
@@ -200,6 +249,7 @@
         });
         bounds_group.addLayer(layer_lotfinalpolygonice_1);
         map.addLayer(layer_lotfinalpolygonice_1);
+
         function pop_BATUSEMPADAN_2(feature, layer) {
             layer.on({
                 mouseout: function(e) {
@@ -214,39 +264,15 @@
                 mouseover: highlightFeature,
             });
             var popupContent = '<table>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['vertex_index'] !== null ? autolinker.link(String(feature.properties['vertex_index']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['vertex_part'] !== null ? autolinker.link(String(feature.properties['vertex_part']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['vertex_part_ring'] !== null ? autolinker.link(String(feature.properties['vertex_part_ring']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['vertex_part_index'] !== null ? autolinker.link(String(feature.properties['vertex_part_index']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['distance'] !== null ? autolinker.link(String(feature.properties['distance']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['angle'] !== null ? autolinker.link(String(feature.properties['angle']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['X'] !== null ? autolinker.link(String(feature.properties['X']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['Y'] !== null ? autolinker.link(String(feature.properties['Y']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
+                    <tr><td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid'])) : '') + '</td></tr>\
+                    <tr><td colspan="2">' + (feature.properties['X'] !== null ? autolinker.link(String(feature.properties['X'])) : '') + '</td></tr>\
+                    <tr><td colspan="2">' + (feature.properties['Y'] !== null ? autolinker.link(String(feature.properties['Y'])) : '') + '</td></tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-			layer.on('popupopen', function(e) {
-				addClassToPopupIfMedia(content, e.popup);
-			});
-			layer.bindPopup(content, { maxHeight: 400 });
+            layer.on('popupopen', function(e) {
+                addClassToPopupIfMedia(content, e.popup);
+            });
+            layer.bindPopup(content, { maxHeight: 400 });
         }
 
         function style_BATUSEMPADAN_2_0() {
@@ -255,10 +281,6 @@
                 radius: 4.0,
                 opacity: 1,
                 color: 'rgba(35,35,35,1.0)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1,
                 fill: true,
                 fillOpacity: 1,
                 fillColor: 'rgba(1,200,255,1.0)',
@@ -267,58 +289,38 @@
         }
         map.createPane('pane_BATUSEMPADAN_2');
         map.getPane('pane_BATUSEMPADAN_2').style.zIndex = 402;
-        map.getPane('pane_BATUSEMPADAN_2').style['mix-blend-mode'] = 'normal';
         var layer_BATUSEMPADAN_2 = new L.geoJson(json_BATUSEMPADAN_2, {
-            attribution: '',
-            interactive: true,
-            dataVar: 'json_BATUSEMPADAN_2',
-            layerName: 'layer_BATUSEMPADAN_2',
             pane: 'pane_BATUSEMPADAN_2',
             onEachFeature: pop_BATUSEMPADAN_2,
             pointToLayer: function (feature, latlng) {
-                var context = {
-                    feature: feature,
-                    variables: {}
-                };
                 return L.circleMarker(latlng, style_BATUSEMPADAN_2_0(feature));
             },
         });
         bounds_group.addLayer(layer_BATUSEMPADAN_2);
         map.addLayer(layer_BATUSEMPADAN_2);
-        setBounds();
+
+        // Labels
         var i = 0;
+        var totalMarkers = 0;
+        var labels = [];
         layer_lotfinalpolygonice_1.eachLayer(function(layer) {
-            var context = {
-                feature: layer.feature,
-                variables: {}
-            };
-            layer.bindTooltip((layer.feature.properties['NO_LOT'] !== null?String('<div style="color: #323232; font-size: 10pt; font-family: \'Arial\', sans-serif;">' + layer.feature.properties['NO_LOT']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_lotfinalpolygonice_1'});
+            var labelContent = (layer.feature.properties['NO_LOT'] !== null?String('<div style="color: #323232; font-size: 10pt; font-family: \'Arial\', sans-serif;">' + layer.feature.properties['NO_LOT']) + '</div>':'');
+            layer.bindTooltip(labelContent, {permanent: true, offset: [-0, -16], className: 'css_lotfinalpolygonice_1'});
             labels.push(layer);
-            totalMarkers += 1;
-              layer.added = true;
-              addLabel(layer, i);
-              i++;
+            i++;
         });
+
+        // Search Control
         map.addControl(new L.Control.Search({
             layer: layer_lotfinalpolygonice_1,
             initial: false,
             hideMarkerOnCollapse: true,
             propertyName: 'NO_LOT'}));
-        if (typeof url === 'undefined') {
-            document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
-        } else {
-            document.getElementsByClassName('search-button')[1].className += ' fa fa-binoculars';
-        }
+        
+        document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
+
         resetLabels([layer_lotfinalpolygonice_1]);
-        map.on("zoomend", function(){
-            resetLabels([layer_lotfinalpolygonice_1]);
-        });
-        map.on("layeradd", function(){
-            resetLabels([layer_lotfinalpolygonice_1]);
-        });
-        map.on("layerremove", function(){
-            resetLabels([layer_lotfinalpolygonice_1]);
-        });
+        map.on("zoomend", function(){ resetLabels([layer_lotfinalpolygonice_1]); });
         </script>        
     </body>
 </html>
