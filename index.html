@@ -4,11 +4,14 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="stylesheet" href="css/leaflet.css">
         <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
         <link rel="stylesheet" href="css/qgis2web.css">
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/leaflet.photon.css">
         <style>
         html, body, #map {
             width: 100%;
@@ -17,66 +20,72 @@
             margin: 0;
         }
 
-        /* --- STYLING LOGO & TAJUK --- */
+        /* --- TAMBAHAN CSS UNTUK LOGO DAN TAJUK ASING --- */
+        
+        /* 1. Kontainer untuk Logo di Atas Kiri */
         #logo-container {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            z-index: 1000;
-            background: white;
-            padding: 8px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            border: 2px solid #ed1c24;
+            top: 20px; /* Jarak dari atas */
+            left: 20px; /* Jarak dari kiri */
+            z-index: 1000; /* Supaya sentiasa di atas peta */
+            background: rgba(255, 255, 255, 0.9); /* Latar belakang putih sikit */
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Bayang-bayang */
+            border: 2px solid #ed1c24; /* Warna merah Poli */
         }
 
         #logo-poli {
-            height: 70px; /* Saiz logo */
+            height: 80px; /* Saiz logo yang sesuai */
             display: block;
         }
 
+        /* 2. Kontainer untuk Tajuk di Atas Tengah */
         #title-container {
             position: absolute;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 20px; /* Jarak dari atas */
+            left: 50%; /* Letak di tengah secara horizontal */
+            transform: translateX(-50%); /* Ubahsuai untuk betul-betul tengah */
             z-index: 1000;
             background: rgba(255, 255, 255, 0.9);
-            padding: 12px 35px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            border: 2px solid #ed1c24;
+            padding: 15px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 2px solid #ed1c24; /* Warna merah Poli */
             text-align: center;
-            min-width: 300px;
         }
 
         #title-main {
             margin: 0;
-            font-family: 'Arial Black', sans-serif;
-            color: #ed1c24;
-            font-size: 28px;
+            font-family: 'Montserrat', 'Arial', sans-serif; /* Font yang lebih moden */
+            color: #ed1c24; /* Warna merah Poli untuk tajuk utama */
+            font-size: 32px; /* Saiz besar untuk tajuk */
+            font-weight: 800; /* Sangat tebal */
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 2px; /* Jarak antara huruf */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2); /* Bayang teks */
         }
 
-        /* Supaya butang zoom tak langgar logo */
+        /* Alihkan butang zoom sikit ke bawah supaya tidak bertindih dengan logo */
         .leaflet-top.leaflet-left {
-            top: 120px !important;
+            top: 130px !important;
         }
+        /* ----------------------------------------------- */
         </style>
         <title>Peta Taman Perumahan</title>
     </head>
     <body>
         
         <div id="logo-container">
-            <img id="logo-poli" src="https://upload.wikimedia.org/wikipedia/ms/thumb/0/02/Politeknik_Ungku_Omar_logo.png/220px-Politeknik_Ungku_Omar_logo.png" alt="Logo Poli">
+            <img id="logo-poli" src="logo_puo.png" alt="Logo Poli">
         </div>
 
         <div id="title-container">
             <h1 id="title-main">TAMAN PERUMAHAN</h1>
+            </div>
+        
+        <div id="map">
         </div>
-
-        <div id="map"></div>
 
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
@@ -88,6 +97,7 @@
         <script src="js/rbush.min.js"></script>
         <script src="js/labelgun.min.js"></script>
         <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
         <script src="js/leaflet-search.js"></script>
         <script src="data/lotfinalpolygonice_1.js"></script>
         <script src="data/BATUSEMPADAN_2.js"></script>
@@ -100,9 +110,8 @@
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
         }).fitBounds([[2.1026374347359114,102.52091717362578],[2.1051311254238736,102.52503551731698]]);
-        
         var hash = new L.Hash(map);
-        map.attributionControl.setPrefix('qgis2web &middot; Leaflet &middot; QGIS');
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
         
         function removeEmptyRowsFromPopupContent(content, feature) {
@@ -119,33 +128,123 @@
          return tempDiv.innerHTML;
         }
 
-        var zoomControl = L.control.zoom({ position: 'topleft' }).addTo(map);
+        function addClassToPopupIfMedia(content, popup) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            var imgTd = tempDiv.querySelector('td img');
+            if (imgTd) {
+                var src = imgTd.getAttribute('src');
+                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp3|wav|ogg|aac)$/i.test(src)) {
+                    var audio = document.createElement('audio');
+                    audio.controls = true;
+                    audio.src = src;
+                    imgTd.parentNode.replaceChild(audio, imgTd);
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp4|webm|ogg|mov)$/i.test(src)) {
+                    var video = document.createElement('video');
+                    video.controls = true;
+                    video.src = src;
+                    video.style.width = "400px";
+                    video.style.height = "300px";
+                    video.style.maxHeight = "60vh";
+                    video.style.maxWidth = "60vw";
+                    imgTd.parentNode.replaceChild(video, imgTd);
+                    popup._contentNode.classList.add('media');
+                    video.addEventListener('loadedmetadata', function() {
+                        popup.update();
+                    });
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else {
+                    popup._contentNode.classList.remove('media');
+                }
+            } else {
+                popup._contentNode.classList.remove('media');
+            }
+        }
+
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {}
 
         map.createPane('pane_GoogleSatellite_0');
         map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
         var layer_GoogleSatellite_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
             pane: 'pane_GoogleSatellite_0',
             opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
             maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
         });
         map.addLayer(layer_GoogleSatellite_0);
 
         function pop_lotfinalpolygonice_1(feature, layer) {
-            layer.on({ mouseover: highlightFeature });
+            layer.on({
+                mouseout: function(e) {
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
             var popupContent = '<table>\
-                    <tr><td colspan="2"><strong>NO_LOT</strong><br />' + (feature.properties['NO_LOT'] !== null ? autolinker.link(String(feature.properties['NO_LOT'])) : '') + '</td></tr>\
-                    <tr><td colspan="2">AREA: ' + (feature.properties['AREA'] !== null ? autolinker.link(String(feature.properties['AREA'])) : '') + '</td></tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>NO_LOT</strong><br />' + (feature.properties['NO_LOT'] !== null ? autolinker.link(String(feature.properties['NO_LOT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AREA'] !== null ? autolinker.link(String(feature.properties['AREA']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['tsp — hakmilik_DAERAH'] !== null ? autolinker.link(String(feature.properties['tsp — hakmilik_DAERAH']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['tsp — hakmilik_NO.PA'] !== null ? autolinker.link(String(feature.properties['tsp — hakmilik_NO.PA']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['tsp — pemilik_PEMILIK'] !== null ? autolinker.link(String(feature.properties['tsp — pemilik_PEMILIK']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
                 </table>';
-            layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+            layer.on('popupopen', function(e) {
+                addClassToPopupIfMedia(content, e.popup);
+            });
+            layer.bindPopup(content, { maxHeight: 400 });
         }
 
         function style_lotfinalpolygonice_1_0() {
             return {
                 pane: 'pane_lotfinalpolygonice_1',
+                opacity: 1,
                 color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
                 weight: 1.0, 
                 fill: true,
-                fillOpacity: 0.6,
+                fillOpacity: 1,
                 fillColor: 'rgba(225,89,137,1.0)',
                 interactive: true,
             }
@@ -154,24 +253,87 @@
         map.getPane('pane_lotfinalpolygonice_1').style.zIndex = 401;
         
         var layer_lotfinalpolygonice_1 = new L.geoJson(json_lotfinalpolygonice_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_lotfinalpolygonice_1',
+            layerName: 'layer_lotfinalpolygonice_1',
             pane: 'pane_lotfinalpolygonice_1',
             onEachFeature: pop_lotfinalpolygonice_1,
             style: style_lotfinalpolygonice_1_0,
         });
+        bounds_group.addLayer(layer_lotfinalpolygonice_1);
         map.addLayer(layer_lotfinalpolygonice_1);
 
-        // Labels Lot
+        function pop_BATUSEMPADAN_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr><td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid'])) : '') + '</td></tr>\
+                    <tr><td colspan="2">' + (feature.properties['X'] !== null ? autolinker.link(String(feature.properties['X'])) : '') + '</td></tr>\
+                    <tr><td colspan="2">' + (feature.properties['Y'] !== null ? autolinker.link(String(feature.properties['Y'])) : '') + '</td></tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+            layer.on('popupopen', function(e) {
+                addClassToPopupIfMedia(content, e.popup);
+            });
+            layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_BATUSEMPADAN_2_0() {
+            return {
+                pane: 'pane_BATUSEMPADAN_2',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(1,200,255,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_BATUSEMPADAN_2');
+        map.getPane('pane_BATUSEMPADAN_2').style.zIndex = 402;
+        var layer_BATUSEMPADAN_2 = new L.geoJson(json_BATUSEMPADAN_2, {
+            pane: 'pane_BATUSEMPADAN_2',
+            onEachFeature: pop_BATUSEMPADAN_2,
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, style_BATUSEMPADAN_2_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_BATUSEMPADAN_2);
+        map.addLayer(layer_BATUSEMPADAN_2);
+
+        // Labels
+        var i = 0;
+        var labels = [];
         layer_lotfinalpolygonice_1.eachLayer(function(layer) {
-            var label = (layer.feature.properties['NO_LOT'] !== null?String(layer.feature.properties['NO_LOT']):'');
-            layer.bindTooltip(label, {permanent: true, direction: 'center', className: 'css_lot_label'});
+            var labelContent = (layer.feature.properties['NO_LOT'] !== null?String('<div style="color: #323232; font-size: 10pt; font-family: \'Arial\', sans-serif;">' + layer.feature.properties['NO_LOT']) + '</div>':'');
+            layer.bindTooltip(labelContent, {permanent: true, offset: [-0, -16], className: 'css_lotfinalpolygonice_1'});
+            labels.push(layer);
+            i++;
         });
 
-        // Search
+        // Search Control
         map.addControl(new L.Control.Search({
             layer: layer_lotfinalpolygonice_1,
             initial: false,
             hideMarkerOnCollapse: true,
             propertyName: 'NO_LOT'}));
+        
+        document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
+
+        resetLabels([layer_lotfinalpolygonice_1]);
+        map.on("zoomend", function(){ resetLabels([layer_lotfinalpolygonice_1]); });
         </script>        
     </body>
 </html>
