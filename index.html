@@ -20,56 +20,80 @@
             margin: 0;
         }
 
-        /* --- TAMBAHAN CSS UNTUK LOGO DAN TAJUK --- */
-        #header-container {
+        /* --- TAMBAHAN CSS UNTUK LOGO DAN TAJUK ASING --- */
+        
+        /* 1. Kontainer untuk Logo di Atas Kiri */
+        #logo-container {
             position: absolute;
-            top: 10px;
-            left: 50px; /* Jarak dari kiri supaya tidak bertindih dengan butang zoom */
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.8);
+            top: 20px; /* Jarak dari atas */
+            left: 20px; /* Jarak dari kiri */
+            z-index: 1000; /* Supaya sentiasa di atas peta */
+            background: rgba(255, 255, 255, 0.9); /* Latar belakang putih sikit */
             padding: 10px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            border: 2px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Bayang-bayang */
+            border: 2px solid #ed1c24; /* Warna merah PUO */
         }
 
         #logo-puo {
-            height: 60px; /* Saiz logo */
-            margin-right: 15px;
+            height: 80px; /* Saiz logo yang sesuai */
+            display: block;
         }
 
-        #title-text {
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            color: #333;
+        /* 2. Kontainer untuk Tajuk di Atas Tengah */
+        #title-container {
+            position: absolute;
+            top: 20px; /* Jarak dari atas */
+            left: 50%; /* Letak di tengah secara horizontal */
+            transform: translateX(-50%); /* Ubahsuai untuk betul-betul tengah */
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 2px solid #ed1c24; /* Warna merah PUO */
+            text-align: center;
         }
 
-        #title-text h2 {
+        #title-main {
             margin: 0;
-            font-size: 18px;
+            font-family: 'Montserrat', 'Arial', sans-serif; /* Font yang lebih moden */
+            color: #ed1c24; /* Warna merah PUO untuk tajuk utama */
+            font-size: 28px; /* Saiz besar untuk tajuk */
+            font-weight: 800; /* Sangat tebal */
             text-transform: uppercase;
+            letter-spacing: 2px; /* Jarak antara huruf */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2); /* Bayang teks */
         }
 
-        #title-text p {
-            margin: 0;
-            font-size: 12px;
+        #title-sub {
+            margin: 5px 0 0 0;
+            font-family: 'Arial', sans-serif;
+            color: #333; /* Warna kelabu gelap untuk sub-tajuk */
+            font-size: 14px;
             font-weight: bold;
+            letter-spacing: 1px;
         }
-        /* ---------------------------------------- */
+
+        /* Alihkan butang zoom sikit ke bawah supaya tidak bertindih dengan logo */
+        .leaflet-top.leaflet-left {
+            top: 130px !important;
+        }
+        /* ----------------------------------------------- */
         </style>
         <title>Peta Taman Perumahan - PUO</title>
     </head>
     <body>
         
-        <div id="header-container">
-            <img id="logo-puo" src="https://upload.wikimedia.org/wikipedia/ms/thumb/0/02/Politeknik_Ungku_Omar_logo.png/220px-Politeknik_Ungku_Omar_logo.png" alt="Logo PUO">
-            <div id="title-text">
-                <h2>TAMAN PERUMAHAN</h2>
-                <p>Politeknik Ungku Omar</p>
-            </div>
+        <div id="logo-container">
+            <img id="logo-puo" src="logo_puo.png" alt="Logo PUO">
         </div>
+
+        <div id="title-container">
+            <h1 id="title-main">TAMAN PERUMAHAN</h1>
+            <p id="title-sub">Politeknik Ungku Omar</p>
+        </div>
+        
         <div id="map">
         </div>
 
@@ -301,7 +325,6 @@
 
         // Labels
         var i = 0;
-        var totalMarkers = 0;
         var labels = [];
         layer_lotfinalpolygonice_1.eachLayer(function(layer) {
             var labelContent = (layer.feature.properties['NO_LOT'] !== null?String('<div style="color: #323232; font-size: 10pt; font-family: \'Arial\', sans-serif;">' + layer.feature.properties['NO_LOT']) + '</div>':'');
